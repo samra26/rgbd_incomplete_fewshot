@@ -112,8 +112,8 @@ class RGBD_incomplete(nn.Module):
 
 
 def build_model(network, base_model_cfg,patch_size, embed_dim, depth,split_size, num_heads, mlp_ratio):
-    backbone = CSWinTransformer(patch_size=4, embed_dim=144, depth=[2,4,32,2],
-        split_size=[1,2,12,12], num_heads=[6,12,24,24], mlp_ratio=4.0)
+    backbone = CSWinTransformer(ppatch_size=4, embed_dim=96, depth=[2,4,32,2],
+        split_size=[1,2,12,12], num_heads=[4,8,16,32], mlp_ratio=4.0)
       
    
 
