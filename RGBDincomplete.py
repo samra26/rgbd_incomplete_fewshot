@@ -14,7 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchvision.utils import make_grid
 writer = SummaryWriter('log/run' + time.strftime("%d-%m"))
 im_size=(320,320)
-k_channels=[144,288,576,1152]
+
 
 class FCU(nn.Module):
     """ Transformer patch embeddings -> CNN feature maps
@@ -35,11 +35,12 @@ class FCU(nn.Module):
         return x_r
 
 class RGBDInModule(nn.Module):
-    def __init__(self, backbone):
+    def __init__(self, backbone,embed_dim):
         super(RGBDInModule, self).__init__()
         self.backbone = backbone
+        self.dim = embed_dim
         for i in range(4):
-            self.add_module('expand_block_' + str(i), FCU(k_channels[i], k_channels[i]))
+            self.add_module('expand_block_' + str(i), FCU(self.dim, self.dim))
 
         
 
@@ -89,7 +90,7 @@ class RGBD_incomplete(nn.Module):
 
         
     def forward(self, f_all):
-        feat_rgb = self.RGBDInModule(f_all)
+        feat_rgb = self.RGBDInModule(f_all,self.embed_dim)
         
         rgb_branch1 = self.conv_stage1(feat_rgb[0])
         rgb_branch2 = self.conv_stage2(feat_rgb[1])
