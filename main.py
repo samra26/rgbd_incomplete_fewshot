@@ -17,8 +17,7 @@ def main(config):
         if not os.path.exists("%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d"))): os.makedirs("%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d")))
         config.save_folder_rgb = "%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d"))
         
-        if not os.path.exists("%s/demo-%s" % (config.save_folder_depth, time.strftime("%d"))):
-            os.mkdir("%s/demo-%s" % (config.save_folder_depth, time.strftime("%d")))
+        if not os.path.exists("%s/demo-%s" % (config.save_folder_depth, time.strftime("%d"))):os.makedirs("%s/demo-%s" % (config.save_folder_depth, time.strftime("%d")))
         config.save_folder_depth = "%s/demo-%s" % (config.save_folder_depth, time.strftime("%d"))
         train = Solver(train_loader, None,config)
         train.train()
