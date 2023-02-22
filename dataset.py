@@ -80,6 +80,45 @@ class ImageDataTrain(data.Dataset):
 
     def __len__(self):
         return self.sal_num
+    
+    
+class ImageDataTrainRGBD(data.Dataset):
+    def __init__(self, data_root, data_list,image_size):
+        self.sal_root = data_root
+        self.sal_source = data_list
+        self.image_size = image_size
+
+        with open(self.sal_source, 'r') as f:
+            self.sal_list = [x.strip() for x in f.readlines()]
+
+        self.sal_num = len(self.sal_list)
+
+    def __getitem__(self, item):
+        # sal data loading
+        im_name = self.sal_list[item % self.sal_num].split()[0]
+        de_name = self.sal_list[item % self.sal_num].split()[1]
+        gt_name = self.sal_list[item % self.sal_num].split()[2]
+        sal_image , im_size= load_image(os.path.join(self.sal_root, im_name), self.image_size)
+        sal_depth, im_size = load_image(os.path.join(self.sal_root, de_name), self.image_size)
+        sal_label,sal_edge = load_sal_label(os.path.join(self.sal_root, gt_name), self.image_size)
+
+        sal_image, sal_depth, sal_label = cv_random_crop(sal_image, sal_depth, sal_label, self.image_size)
+        sal_image = sal_image.transpose((2, 0, 1))
+        sal_depth = sal_depth.transpose((2, 0, 1))
+        sal_label = sal_label.transpose((2, 0, 1))
+        #sal_edge = sal_edge.transpose((2, 0, 1))
+
+        sal_image = torch.Tensor(sal_image)
+        sal_depth = torch.Tensor(sal_depth)
+        sal_label = torch.Tensor(sal_label)
+        #sal_edge = torch.Tensor(sal_edge)
+        dq=depth_quality_score(sal_depth)
+        #print('rgbd',sal_image.shape,sal_depth.shape,sal_label.shape)
+        #sample = {'sal_image': sal_image, 'sal_depth': sal_depth, 'sal_label': sal_label, 'sal_edge': sal_edge,'depth_quality_score':dq,'name': self.sal_list[item % self.sal_num].split()[0].split('/')[1]}
+        return sal_image,sal_depth,sal_label
+
+    def __len__(self):
+        return self.sal_num
 
 
 class ImageDataTest(data.Dataset):
@@ -108,13 +147,17 @@ def get_loader(config, mode='train', pin=True):
     shuffle = False
     if mode == 'train':
         shuffle = True
-        dataset1 = ImageDataTrain(config.train_root, config.train_list, config.image_size)
-        dataset2 = DatasetGenerate(config.img_folder, config.gt_folder,config.image_size)
+        if config.model_type == 'teacherRGB':
+            dataset1 = ImageDataTrain(config.train_root, config.train_list, config.image_size)
+            dataset2 = DatasetGenerate(config.img_folder, config.gt_folder,config.image_size)
         
-        dataset = torch.utils.data.ConcatDataset([dataset1, dataset2])
-        data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,num_workers=config.num_thread, pin_memory=pin)
-        
-        #print('dataset length',len(dataset))
+            dataset = torch.utils.data.ConcatDataset([dataset1, dataset2])
+            data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,num_workers=config.num_thread, pin_memory=pin)
+            print(config.model_type,'dataset length',len(dataset))
+        else:
+            dataset = ImageDataTrainRGBD(config.train_root, config.train_list, config.image_size)
+            data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,num_workers=config.num_thread, pin_memory=pin)
+            print(config.model_type,'dataset length',len(dataset))
     else:
         dataset = ImageDataTest(config.test_root, config.test_list, config.image_size)
         data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,
