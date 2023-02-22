@@ -28,8 +28,7 @@ class Solver(object):
         self.save_folder_depth = config.save_folder_depth
         self.save_folder = config.save_folder
         #self.build_model()
-        self.net = build_model(self.config.network, self.config.arch, self.config.patch_size, self.config.embed_dim, self.config.depth,
-        self.config.split_size, self.config.num_heads, self.config.mlp_ratio)
+        self.net = build_model(self.config.network, self.config.arch)
         #self.net.eval()
         if config.mode == 'test':
             print('Loading pre-trained model for testing from %s...' % self.config.model)
