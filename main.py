@@ -45,6 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('--image_size', type=int, default=384)
     parser.add_argument('--cuda', type=bool, default=True)
     parser.add_argument('--device_id', type=str, default='cuda:0')
+    parser.add_argument('--model_type', type=str, default='teacherRGB',choices=['teacherRGB', 'teacherDepth','student'])
 
     # Training settings
     parser.add_argument('--arch', type=str, default='cswin'
