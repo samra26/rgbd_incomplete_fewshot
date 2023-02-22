@@ -14,8 +14,7 @@ def main(config):
             os.mkdir("%s/demo-%s" % (config.save_folder, time.strftime("%d")))
         config.save_folder = "%s/demo-%s" % (config.save_folder, time.strftime("%d"))
         
-        if not os.path.exists("%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d"))):
-            os.mkdir("%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d")))
+        if not os.path.exists("%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d"))): os.makedirs("%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d")))
         config.save_folder_rgb = "%s/demo-%s" % (config.save_folder_rgb, time.strftime("%d"))
         
         if not os.path.exists("%s/demo-%s" % (config.save_folder_depth, time.strftime("%d"))):
