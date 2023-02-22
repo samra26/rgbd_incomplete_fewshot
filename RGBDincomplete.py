@@ -90,7 +90,7 @@ class RGBD_incomplete(nn.Module):
 
         
     def forward(self, f_all):
-        feat_rgb = self.RGBDInModule(f_all,self.embed_dim)
+        feat_rgb = self.RGBDInModule(f_all)
         
         rgb_branch1 = self.conv_stage1(feat_rgb[0])
         rgb_branch2 = self.conv_stage2(feat_rgb[1])
@@ -118,4 +118,4 @@ def build_model(network, base_model_cfg,embed_dim):
       
    
 
-    return RGBD_incomplete(embed_dim,RGBDInModule(backbone))
+    return RGBD_incomplete(embed_dim,RGBDInModule(backbone,embed_dim))
