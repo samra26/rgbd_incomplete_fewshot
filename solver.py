@@ -23,6 +23,10 @@ class Solver(object):
         self.config = config
         self.iter_size = config.iter_size
         self.show_every = config.show_every
+        self.model_type = config.model_type
+        self.save_folder_rgb = config.save_folder_rgb
+        self.save_folder_depth = config.save_folder_depth
+        self.save_folder = config.save_folder
         #self.build_model()
         self.net = build_model(self.config.network, self.config.arch, self.config.patch_size, self.config.embed_dim, self.config.depth,
         self.config.split_size, self.config.num_heads, self.config.mlp_ratio)
@@ -116,7 +120,7 @@ class Solver(object):
         for epoch in range(self.config.epoch):
             r_sal_loss = 0
             r_sal_loss_item=0
-            if config.model_type == 'teacherRGB':
+            if self.model_type == 'teacherRGB':
                 for i, data_batch in enumerate(self.train_loader):
                     sal_image, sal_label= data_batch[0], data_batch[1]
                     if (sal_image.size(2) != sal_label.size(2)) or (sal_image.size(3) != sal_label.size(3)):
@@ -155,7 +159,7 @@ class Solver(object):
                         device = torch.device(self.config.device_id)
                         sal_image, sal_depth, sal_label= sal_image.to(device),sal_depth.to(device), sal_label.to(device)
                     self.optimizer.zero_grad()
-                    if config.model_type == 'teacherDepth':
+                    if self.model_type == 'teacherDepth':
                         sal_depth_only = self.net(sal_depth)
                         sal_depth_only_loss =  F.binary_cross_entropy_with_logits(sal_depth_only, sal_label, reduction='sum')
                         sal_depth_only_loss = sal_depth_only_loss/ (self.iter_size * self.config.batch_size)
@@ -200,23 +204,23 @@ class Solver(object):
 
 
             if (epoch + 1) % self.config.epoch_save == 0:
-                if config.model_type == 'teacherRGB':
-                    torch.save(self.net.state_dict(), '%s/epoch_%d.pth' % (self.config.save_folder_rgb, epoch + 1))
-                elif config.model_type == 'teacherDepth':
-                    torch.save(self.net.state_dict(), '%s/epoch_%d.pth' % (self.config.save_folder_depth, epoch + 1))
+                if self.model_type == 'teacherRGB':
+                    torch.save(self.net.state_dict(), '%s/epoch_%d.pth' % (self.save_folder_rgb, epoch + 1))
+                elif self.model_type == 'teacherDepth':
+                    torch.save(self.net.state_dict(), '%s/epoch_%d.pth' % (self.save_folder_depth, epoch + 1))
                 else:
-                    torch.save(self.net.state_dict(), '%s/epoch_%d.pth' % (self.config.save_folder, epoch + 1))
+                    torch.save(self.net.state_dict(), '%s/epoch_%d.pth' % (self.save_folder, epoch + 1))
             train_loss=r_sal_loss_item/len(self.train_loader.dataset)
             loss_vals.append(train_loss)
             
             print('Epoch:[%2d/%2d] | Train Loss : %.3f' % (epoch, self.config.epoch,train_loss))
             
         # save model
-        if config.model_type == 'teacherRGB':
-            torch.save(self.net.state_dict(), '%s/final.pth' % self.config.save_folder_rgb)
-        elif config.model_type == 'teacherDepth':
-            torch.save(self.net.state_dict(), '%s/final.pth' % self.config.save_folder_depth)
+        if self.model_type == 'teacherRGB':
+            torch.save(self.net.state_dict(), '%s/final.pth' % self.save_folder_rgb)
+        elif self.model_type == 'teacherDepth':
+            torch.save(self.net.state_dict(), '%s/final.pth' % self.save_folder_depth)
         else:
-            torch.save(self.net.state_dict(), '%s/final.pth' % self.config.save_folder)
+            torch.save(self.net.state_dict(), '%s/final.pth' % self.save_folder)
         
 
