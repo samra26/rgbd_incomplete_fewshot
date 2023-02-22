@@ -71,19 +71,20 @@ class RGBDInModule(nn.Module):
 
 
 class RGBD_incomplete(nn.Module):
-    def __init__(self,RGBDInModule):
+    def __init__(self,embed_dim,RGBDInModule):
         super(RGBD_incomplete, self).__init__()
         
         self.RGBDInModule = RGBDInModule
+        self.embed_dim=embed_dim
         self.relu = nn.ReLU(inplace=True)
-        self.conv_stage1=nn.Sequential(nn.Conv2d(k_channels[0], int(k_channels[0] / 1), 1), self.relu)
-        self.conv_stage2=nn.Sequential(nn.Conv2d(k_channels[1], int(k_channels[1] / 2), 1), self.relu)
-        self.conv_stage3=nn.Sequential(nn.Conv2d(k_channels[2], int(k_channels[2] / 4), 1), self.relu)
-        self.conv_stage4=nn.Sequential(nn.Conv2d(k_channels[3], int(k_channels[3] / 8), 1), self.relu)
-        self.deconv_stage1=nn.ConvTranspose2d(144,1,kernel_size=3, stride=4, padding=0, output_padding=1, dilation=1)
-        self.deconv_stage2=nn.ConvTranspose2d(144,1,kernel_size=3, stride=8, padding=0, output_padding=3, dilation=2)
-        self.deconv_stage3=nn.ConvTranspose2d(144,1,kernel_size=5, stride=16, padding=0, output_padding=3, dilation=3)
-        self.deconv_stage4=nn.ConvTranspose2d(144,1,kernel_size=7, stride=32, padding=1, output_padding=3, dilation=5)
+        self.conv_stage1=nn.Sequential(nn.Conv2d(self.embed_dim, self.embed_dim, 1), self.relu)
+        self.conv_stage2=nn.Sequential(nn.Conv2d(self.embed_dim*2, self.embed_dim, 1), self.relu)
+        self.conv_stage3=nn.Sequential(nn.Conv2d(self.embed_dim*4, self.embed_dim, 1), self.relu)
+        self.conv_stage4=nn.Sequential(nn.Conv2d(self.embed_dim*8, self.embed_dim, 1), self.relu)
+        self.deconv_stage1=nn.ConvTranspose2d(self.embed_dim,1,kernel_size=3, stride=4, padding=0, output_padding=1, dilation=1)
+        self.deconv_stage2=nn.ConvTranspose2d(self.embed_dim,1,kernel_size=3, stride=8, padding=0, output_padding=3, dilation=2)
+        self.deconv_stage3=nn.ConvTranspose2d(self.embed_dim,1,kernel_size=5, stride=16, padding=0, output_padding=3, dilation=3)
+        self.deconv_stage4=nn.ConvTranspose2d(self.embed_dim,1,kernel_size=7, stride=32, padding=1, output_padding=3, dilation=5)
         self.last_conv=nn.Conv2d(4,1,1,1)
 
         
@@ -110,10 +111,10 @@ class RGBD_incomplete(nn.Module):
         
 
 
-def build_model(network='cswin', base_model_cfg='cswin'):
+def build_model(network, base_model_cfg,patch_size, embed_dim, depth,split_size, num_heads, mlp_ratio):
     backbone = CSWinTransformer(patch_size=4, embed_dim=144, depth=[2,4,32,2],
         split_size=[1,2,12,12], num_heads=[6,12,24,24], mlp_ratio=4.0)
       
    
 
-    return RGBD_incomplete(RGBDInModule(backbone))
+    return RGBD_incomplete(embed_dim,RGBDInModule(backbone))
