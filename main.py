@@ -62,12 +62,12 @@ if __name__ == '__main__':
     parser.add_argument('--network', type=str, default='cswin'
                         , choices=['resnet50', 'resnet101', 'vgg16', 'densenet161','conformer','cswin'])  # Network Architecture
     #conformer setting
-    parser.add_argument('--patch_size', type=int, default=16)
-    parser.add_argument('--channel_ratio', type=int, default=4)
-    parser.add_argument('--embed_dim', type=int, default=384)
-    parser.add_argument('--depth', type=int, default=12)
-    parser.add_argument('--num_heads', type=int, default=6)
-    parser.add_argument('--mlp_ratio', type=int, default=4)
+    parser.add_argument('--patch_size', type=int, default=4)
+    parser.add_argument('--split_size', type=int, default=[1,2,12,12])
+    parser.add_argument('--embed_dim', type=int, default=144)
+    parser.add_argument('--depth', type=int, default=[2,4,32,2])
+    parser.add_argument('--num_heads', type=int, default=[6,12,24,24])
+    parser.add_argument('--mlp_ratio', type=float, default=4.0)
     # Train data
     parser.add_argument('--train_root', type=str, default='../RGBDcollection')
     parser.add_argument('--train_list', type=str, default='../RGBDcollection/train.lst')
