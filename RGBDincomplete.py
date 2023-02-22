@@ -39,8 +39,9 @@ class RGBDInModule(nn.Module):
         super(RGBDInModule, self).__init__()
         self.backbone = backbone
         self.dim = embed_dim
+        scalar=[1,2,4,8]
         for i in range(4):
-            self.add_module('expand_block_' + str(i), FCU(self.dim, self.dim))
+            self.add_module('expand_block_' + str(i), FCU(self.dim*scalar[i], self.dim*scalar[i]))
 
         
 
