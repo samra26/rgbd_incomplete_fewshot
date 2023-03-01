@@ -17,8 +17,9 @@ size_coarse = (10, 10)
 
 
 class Solver(object):
-    def __init__(self, train_loader, test_loader, config):
+    def __init__(self, train_loader, train_depth_loader, test_loader, config):
         self.train_loader = train_loader
+        self.train_depth_loader = train_depth_loader
         self.test_loader = test_loader
         self.config = config
         self.iter_size = config.iter_size
