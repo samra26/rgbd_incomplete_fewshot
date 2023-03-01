@@ -147,24 +147,28 @@ def get_loader(config, mode='train', pin=True):
     shuffle = False
     if mode == 'train':
         shuffle = True
-        if config.model_type == 'teacherRGB':
-            dataset1 = ImageDataTrain(config.train_root, config.train_list, config.image_size)
-            dataset2 = DatasetGenerate(config.img_folder, config.gt_folder,config.image_size)
         
-            dataset = torch.utils.data.ConcatDataset([dataset1, dataset2])
-            data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,num_workers=config.num_thread, pin_memory=pin)
-            print(config.model_type,'dataset length',len(dataset))
-        else:
-            dataset = ImageDataTrainRGBD(config.train_root, config.train_list, config.image_size)
-            data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,num_workers=config.num_thread, pin_memory=pin)
-            print(config.model_type,'dataset length',len(dataset))
+        dataset1 = ImageDataTrain(config.train_root, config.train_list, config.image_size)
+        dataset2 = DatasetGenerate(config.img_folder, config.gt_folder,config.image_size)
+        
+        dataset = torch.utils.data.ConcatDataset([dataset1, dataset2])
+        data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,num_workers=config.num_thread, pin_memory=pin)
+        print(config.model_type,'rgb dataset length',len(dataset))
+
     else:
         dataset = ImageDataTest(config.test_root, config.test_list, config.image_size)
         data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,
                                       num_workers=config.num_thread, pin_memory=pin)
     return data_loader
 
-
+def get_loader_depth(config, mode='train', pin=True):
+    shuffle = False
+    if mode == 'train':
+  
+        dataset = ImageDataTrainRGBD(config.train_root, config.train_list, config.image_size)
+        data_loader = data.DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=shuffle,num_workers=config.num_thread, pin_memory=pin)
+        print(config.model_type,'depth dataset length',len(dataset))
+    return data_loader
 
 def load_image(path,image_size):
     if not os.path.exists(path):
