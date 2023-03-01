@@ -1,6 +1,7 @@
 import argparse
 import os
 from dataset import get_loader
+from dataset import get_loader_depth
 from solver import Solver
 import time
 
