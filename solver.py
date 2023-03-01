@@ -177,6 +177,7 @@ class Solver(object):
                         dr_sal_loss_item+=sal_depth_only_loss.item() * depth_image.size(0)
                         sal_depth_only_loss.backward()
                         self.optimizer.step()
+                        
                         if (i + 1) % (self.show_every // self.config.batch_size) == 0:
                             print('epoch: [%2d/%2d], iter: [%5d/%5d]  ||  sal_depth_only_loss : %0.4f' % (
                                 epoch, self.config.epoch, i + 1, iter_numd, dr_sal_loss ))
@@ -189,6 +190,7 @@ class Solver(object):
                             fsald = (fsald - fsald.min()) / (fsald.max() - fsald.min() + 1e-8)
                             writer.add_image('sal_depth_final', torch.tensor(fsal), i, dataformats='HW')
                             grid_image = make_grid(label[0].clone().cpu().data, 1, normalize=True)
+                    count=0
 
 
             if (epoch + 1) % self.config.epoch_save == 0:
