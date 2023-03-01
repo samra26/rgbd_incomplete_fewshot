@@ -170,7 +170,7 @@ class Solver(object):
                             device = torch.device(self.config.device_id)
                             rgb_image, depth_image, label= rgb_image.to(device),depth_image.to(device), label.to(device)
                         self.optimizer.zero_grad()
-                        sal_depth_only = self.net_d(sal_depth)
+                        sal_depth_only = self.net_d(depth_image)
                         sal_depth_only_loss =  F.binary_cross_entropy_with_logits(sal_depth_only, label, reduction='sum')
                         sal_depth_only_loss = sal_depth_only_loss/ (self.iter_size * self.config.batch_size/4)
                         dr_sal_loss += sal_depth_only_loss.data
