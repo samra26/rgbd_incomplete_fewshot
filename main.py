@@ -9,6 +9,7 @@ import time
 def main(config):
     if config.mode == 'train':
         train_loader = get_loader(config)
+        train_depth_loader = get_loader(config)
         print('train dataset loaded',len(train_loader))
         if not os.path.exists("%s/demo-%s" % (config.save_folder, time.strftime("%d"))):
             os.mkdir("%s/demo-%s" % (config.save_folder, time.strftime("%d")))
@@ -19,13 +20,13 @@ def main(config):
         
         if not os.path.exists("%s/demo-%s" % (config.save_folder_depth, time.strftime("%d"))):os.makedirs("%s/demo-%s" % (config.save_folder_depth, time.strftime("%d")))
         config.save_folder_depth = "%s/demo-%s" % (config.save_folder_depth, time.strftime("%d"))
-        train = Solver(train_loader, None,config)
+        train = Solver(train_loader,train_depth_loader, None,config)
         train.train()
     elif config.mode == 'test':
         #get_test_info(config)
         test_loader = get_loader(config, mode='test')
         if not os.path.exists(config.test_folder): os.makedirs(config.test_folder)
-        test = Solver(None, test_loader, config)
+        test = Solver(None, None,test_loader, config)
         test.test()
     else:
         raise IOError("illegal input!!!")
